@@ -1,21 +1,44 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { constants, createPrivateKey, privateDecrypt, KeyObject } from "crypto";
+import { readFileSync } from "fs";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    context.log('HTTP trigger function processed a request.');
-    const name = (req.query.name || (req.body && req.body.name));
+const INPUT_HEADER_NAME: string = "x-jotform-input";
+const KEY_PATH: string = "/Users/ross/Downloads/jotformv2_5520.pem";
 
-    if (name) {
-        context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: "Hello " + (req.query.name || req.body.name)
-        };
-    }
-    else {
-        context.res = {
-            status: 400,
-            body: "Please pass a name on the query string or in the request body"
-        };
-    }
+const keyMaterial: Buffer = readFileSync(KEY_PATH);
+const key: KeyObject = createPrivateKey(keyMaterial);
+
+function decrypt(base64Input) {
+  const buffer: Buffer = Buffer.from(base64Input, "base64");
+  const decrypted: Buffer = privateDecrypt(
+    {
+      key,
+      passphrase: "",
+      padding: constants.RSA_PKCS1_PADDING,
+    },
+    buffer
+  );
+
+  return decrypted.toString();
+}
+
+const httpTrigger: AzureFunction = async function (
+  context: Context,
+  req: HttpRequest
+): Promise<void> {
+  const input = req.headers[INPUT_HEADER_NAME];
+
+  if (input) {
+    context.res = {
+      // status: 200, /* Defaults to 200 */
+      body: decodeURIComponent(decrypt(input)),
+    };
+  } else {
+    context.res = {
+      status: 400,
+      body: `Please pass input as header ${INPUT_HEADER_NAME}`,
+    };
+  }
 };
 
 export default httpTrigger;
