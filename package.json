@@ -10,7 +10,8 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@types/node": "^14.0.1"
+    "@types/node": "^14.0.1",
+    "xlsx": "^0.16.1"
   },
   "devDependencies": {
     "@azure/functions": "^1.0.2-beta2",
