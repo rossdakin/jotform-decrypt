@@ -1,8 +1,9 @@
+// npm run xlsx
+
 import decrypt from "./decrypt";
 
-const INPUT_FILE =
-  "/Users/ross/Downloads/Nursing Home Violation Reporting Form - ENC(2020-05-21).xlsx";
-const SHEET_NAME = "Submissions";
+const INPUT_FILE = "/Users/ross/Downloads/ENC2020-05-enc.xlsx";
+const SHEET_NAME = "Nursing_Home_Violation_Reportin";
 const XLSX = require("xlsx");
 const SKIP: number = 10;
 const PLAIN_COLS: number[] = [16];
