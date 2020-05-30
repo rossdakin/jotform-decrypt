@@ -1,6 +1,6 @@
 // npm run xlsx
 
-import decrypt from "./decrypt";
+import { decrypt } from "./decrypt";
 import { readFile, writeFile, utils } from 'xlsx';
 
 const INPUT_FILE = "/Users/ross/Downloads/ENC2020-05-enc.xlsx";

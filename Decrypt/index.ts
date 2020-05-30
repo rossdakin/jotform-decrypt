@@ -1,39 +1,9 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import { base64Decode } from './base64';
-import decrypt from "./decrypt";
+import { decrypt, decryptJson } from "./decrypt";
 
 const BASE64_HEADER_NAME: string = "x-is-base64";
 const INPUT_TYPE_HEADER_NAME: string = "accept";
-
-const objectMap = (obj: object, fn: (v: any, k: any, i: number) => object) =>
-  Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]));
-
-async function decryptObject(input: any): Promise<any> {
-  // array
-  if (Array.isArray(input)) {
-    return input.map(decryptObject);
-  }
-
-  // object
-  if (typeof input === "object") {
-    return objectMap(input, decryptObject);
-  }
-
-  // literal
-  try {
-    return await decrypt(input);
-  } catch {
-    // input corrupted, or not encrypted (more likely); just return the input (kind of a silent fail)
-    return input;
-  }
-}
-
-async function decryptJson(inputJson: string): Promise<string> {
-  const input: any = JSON.parse(inputJson);
-  const output: any = await decryptObject(input);
-
-  return JSON.stringify(output);
-}
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
