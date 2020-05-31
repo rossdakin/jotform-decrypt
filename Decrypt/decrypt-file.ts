@@ -3,17 +3,10 @@
 import { decrypt } from "./decrypt";
 import { readFile, writeFile, utils } from 'xlsx';
 
-const INPUT_FILE = "/Users/ross/Downloads/ENC2020-05-enc.xlsx";
-const SHEET_NAME = "Nursing_Home_Violation_Reportin";
+const INPUT_FILE = "/Users/ross/Downloads/Nursing Home Violation Reporting Form - ENC(2020-05-31).xlsx";
+const SHEET_NAME = "Submissions";
 const SKIP: number = 10;
 const PLAIN_COLS: number[] = [16];
-
-// Multi-select values are joined with "; "
-async function decryptJotformCell(input: string): Promise<string> {
-  const inputs: string[] = input.split("; ");
-  const outputs: string[] = await Promise.all(inputs.map(decrypt));
-  return outputs.join("\n");
-}
 
 async function decryptXLSX(): Promise<void> {
   const workbook = readFile(INPUT_FILE, {
@@ -43,7 +36,7 @@ async function decryptXLSX(): Promise<void> {
 
       if (value) {
         try {
-          cell.v = await decryptJotformCell(value);
+          cell.v = await decrypt(value);
         } catch (e) {
           console.log(`Error with ${cell_ref} ("${value}"): `, e);
         }
