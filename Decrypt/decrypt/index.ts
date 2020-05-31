@@ -1,5 +1,5 @@
-// import decryptChunk from './decryptChunkUsingKeyVault'; // prod
-import decryptChunk from './decryptChunkUsingLocalFile'; // dev
+import decryptChunk from './decryptChunkUsingKeyVault'; // prod
+// import decryptChunk from './decryptChunkUsingLocalFile'; // dev
 
 import { AllHtmlEntities } from 'html-entities';
 const htmlEntities = new AllHtmlEntities();
