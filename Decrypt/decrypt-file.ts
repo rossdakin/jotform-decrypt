@@ -9,11 +9,13 @@ const SKIP: number = 10;
 const PLAIN_COLS: number[] = [16];
 
 // Multi-select values are joined with "; "
-function decryptJotformCell(input: string): string {
-  return input.split("; ").map(decrypt).join("\n");
+async function decryptJotformCell(input: string): Promise<string> {
+  const inputs: string[] = input.split("; ");
+  const outputs: string[] = await Promise.all(inputs.map(decrypt));
+  return outputs.join("\n");
 }
 
-function decryptXLSX(): void {
+async function decryptXLSX(): Promise<void> {
   const workbook = readFile(INPUT_FILE, {
     type: "file",
     sheets: [SHEET_NAME],
@@ -41,7 +43,7 @@ function decryptXLSX(): void {
 
       if (value) {
         try {
-          cell.v = decryptJotformCell(value);
+          cell.v = await decryptJotformCell(value);
         } catch (e) {
           console.log(`Error with ${cell_ref} ("${value}"): `, e);
         }
