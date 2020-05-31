@@ -1,17 +1,22 @@
 import { decrypt } from '.';
 
-const objectMap = (obj: object, fn: (v: any, k: any, i: number) => object) =>
-  Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]));
+async function decryptObjectEntry(entry: [string, unknown]): Promise<[string, unknown]> {
+  const [key, val] = entry;
+  return [key, await decryptObject(val)];
+}
 
 async function decryptObject(input: any): Promise<any> {
   // array
   if (Array.isArray(input)) {
-    return input.map(decryptObject);
+    return Promise.all(input.map(decryptObject));
   }
 
   // object
   if (typeof input === "object") {
-    return objectMap(input, decryptObject);
+    const entries: [string, unknown][] = Object.entries(input);
+    const decryptingEntries: Promise<[string, unknown]>[] = entries.map(decryptObjectEntry);
+    const decryptedEntries: [string, unknown][] = await Promise.all(decryptingEntries);
+    return Object.fromEntries(decryptedEntries);
   }
 
   // literal
